@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %} User registration {% endblock %}
+{% block css %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% endblock %}
+{% block content %} 
+<div class="container pt-4">
+    <form id="signup_submit">
+      {% csrf_token %}
+    
+      <div class="form-group mt-4">
+            <label for="username">User Name</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+          </div>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Email</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" name="email" placeholder="Email">
+        </div>
+        <div class="form-group">
+          <label for="pass1">Password</label>
+          <input type="password" onkeyup="passwordValidator()" class="form-control" id="pass1" name="password" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <label for="pass2">Conf Password</label>
+            <input type="password" onkeyup="passwordValidator()" class="form-control" id="pass2" name="password" placeholder="Confirm pass">
+            <p id="validate_info"></p>
+          </div>
+        <button  type="submit"  id="btn_submit_permision" class="btn btn-primary btn-md btn-block">Create account</button>
+      </form>
+</div>
+{% endblock %}
+
+{% block mydynamic_js %}
+
+<script>
+    $(document).ready(function(){
+        $("#signup_submit").submit(function(e){
+            e.preventDefault(); // default action is off by this line
+            var username = $("#username").val()
+            var email = $("#email").val()
+            var password = $("#pass1").val()
+            var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+
+            our_data_json = {
+                "username":username,
+                "email":email,
+                "password":password,
+            }
+            $.ajax({
+                type:"POST",
+                url:"/login/",
+                headers:{
+                    "X-CSRFToken":csrftoken
+                },
+                data:our_data_json,
+                dataType:"json",
+                success:function(data){
+                    console.log("ok")
+                    console.log(data)
+                }
+            })
+
+
+        });
+    });
+
+    function passwordValidator(){
+        var pass1 = document.getElementById("pass1").value
+        var pass2 = document.getElementById("pass2").value
+        if ((pass2 !== "") && (pass1 == pass2)){
+            document.getElementById("validate_info").innerHTML="password matched"
+            document.getElementById("validate_info").style.color="green"
+            document.getElementById("btn_submit_permision").style.display="block"
+
+        }
+        else if(pass2 === "" || pass1 ===""){
+            document.getElementById("validate_info").innerHTML=""
+            document.getElementById("validate_info").style.color="green"
+            document.getElementById("btn_submit_permision").style.display="block"
+            
+        }
+        else{
+            document.getElementById("validate_info").innerHTML="password not matched"
+            document.getElementById("validate_info").style.color="red"
+            document.getElementById("btn_submit_permision").style.display="none"
+        }
+    }
+</script>
+{% endblock %}
